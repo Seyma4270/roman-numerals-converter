@@ -1,0 +1,80 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: |
+  This CloudFormation Template was written for running roman-numerals-converter Website on EC2. 
+  Roman-numerals Website will be deployed on Amazon Linux 2023 EC2 Instance with custom 
+  security group which allows http connections on port 80 and ssh port 22 from anywhere. Website
+  is downloaded from my Public Github repository, then deployed on Flask.
+Parameters:
+  myKeyPair:
+    Description: Select the name of your keyname
+    Type: AWS::EC2::KeyPair::KeyName
+    Default: sym
+  myInstanceType:
+    Description: Select your instance type.
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+      - t3.small
+
+  LatestAmiId:
+    Type: "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>"
+    Default: "/aws/service/ami-amazon-linux-latest/al2023-ami-kernel-6.1-x86_64"
+
+Resources:
+  myWebServer:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref LatestAmiId
+
+      InstanceType: !Ref myInstanceType
+
+      KeyName: !Ref myKeyPair
+
+      SecurityGroupIds:
+        - !Ref mySecGrp #!GetAtt mySecGrp.GroupId
+
+      Tags:
+        - Key: "Name"
+          Value: !Sub "Web Server of ${AWS::StackName} Stack"
+
+      UserData: !Base64 |
+          #!/bin/bash
+          sudo dnf update -y
+          sudo dnf install python3 -y
+          sudo dnf install python3-pip -y
+          pip3 install Flask
+          sudo dnf install git -y
+          cd /home/ec2-user
+          git clone https://github.com/Seyma4270/roman-numerals-converter.git
+          cd roman-numerals-converter
+          python3 app.py
+   
+  mySecGrp:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enables SSH and HTTP for CFN Instances # Required
+
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+          Description: enable http port
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+          Description: enable ssh port
+      Tags:
+        - Key: Name
+          Value: sym-cloudformaition-sec-group
+
+Outputs:
+  WebsiteURL:
+    Value: !Sub
+      - http://${PublicAddress}
+      - PublicAddress: !GetAtt myWebServer.PublicIp
+    Description: Romsn-numerals-converter Application URL
