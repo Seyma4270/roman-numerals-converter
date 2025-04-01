@@ -14,8 +14,12 @@ def convert(decimal_num):
     
     return num_to_roman
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route("/")
 def index():
+    return render_template("index.html", methods=["GET"],developer_name="seyma")
+
+@app.route('/romansayi', methods=['GET', 'POST'])
+def romansayi():
     if request.method == 'POST':
         number = request.form.get('number')  # Formdan gelen 'number' verisini al
         try:
