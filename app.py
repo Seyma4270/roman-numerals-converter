@@ -14,9 +14,9 @@ def convert(decimal_num):
     
     return num_to_roman
 
-@app.route("/")
+@app.route("/",methods=["GET"])
 def index():
-    return render_template("index.html", methods=["GET"],developer_name="seyma")
+    return render_template("index.html", developer_name="seyma")
 
 @app.route('/romansayi', methods=['GET', 'POST'])
 def romansayi():
