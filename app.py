@@ -30,10 +30,10 @@ def index():
                                        developer_name="seyma" )  
             else:
                 # Hatalı giriş için uyarı
-                return render_template('index.html', not_valid=True)
+                return render_template('index.html', not_valid=True,developer_name="seyma" )
         except ValueError:
             # Sayı değilse hata
-            return render_template('index.html', not_valid=True)
+            return render_template('index.html', not_valid=True,developer_name="seyma" )
     
     # İlk kez sayfa açıldığında sadece formu göster
     return render_template('index.html', not_valid=False)
