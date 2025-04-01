@@ -41,16 +41,18 @@ Resources:
           Value: !Sub "Web Server of ${AWS::StackName} Stack"
 
       UserData: !Base64 |
-          #!/bin/bash
-          sudo dnf update -y
-          sudo dnf install python3 -y
-          sudo dnf install python3-pip -y
-          pip3 install Flask
-          sudo dnf install git -y
-          cd /home/ec2-user
-          git clone https://github.com/Seyma4270/roman-numerals-converter.git
-          cd roman-numerals-converter
-          python3 app.py
+        #!/bin/bash
+        sudo dnf update -y
+        sudo dnf install python3 -y
+        sudo dnf install python3-pip -y
+        pip3 install Flask
+        sudo dnf install git -y
+        cd /home/ec2-user
+        git clone https://github.com/Seyma4270/roman-numerals-converter.git
+        cd roman-numerals-converter
+       # Flask uygulamasını dış IP'ye açacak şekilde başlat
+        FLASK_APP=app.py FLASK_RUN_HOST=0.0.0.0 flask run --host=0.0.0.0 --port=80
+          
    
   mySecGrp:
     Type: AWS::EC2::SecurityGroup
